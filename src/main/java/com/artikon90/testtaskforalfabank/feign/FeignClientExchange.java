@@ -5,6 +5,8 @@ import com.artikon90.testtaskforalfabank.model.Course;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
+import java.util.HashMap;
+
 @FeignClient(value = "getExchange", url = "${integration.exchange.url}")
 public interface FeignClientExchange {
     @GetMapping("/historical/{date}.json?app_id={key}")
@@ -13,4 +15,7 @@ public interface FeignClientExchange {
 
     @GetMapping("/latest.json?app_id={key}")
     Course getToday(@PathVariable("key") String key);
+
+    @GetMapping("/currencies.json")
+    HashMap<String, String> getAllCurrency();
 }
