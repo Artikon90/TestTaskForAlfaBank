@@ -5,10 +5,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Map;
+import java.time.LocalDate;
+import java.util.*;
 
 @Service
 public class CourseService {
@@ -16,18 +14,17 @@ public class CourseService {
     @Value("${integration.exchange.key}")
     private String apiKey;
     private final FeignClientExchange feignClientExchange;
-    private final Calendar cal;
 
     @Autowired
     public CourseService(FeignClientExchange exchange) {
-        this.cal = Calendar.getInstance();
         this.feignClientExchange = exchange;
     }
 
     public Double getDifferenceRate(String currency) {
-        cal.add(Calendar.DATE, -1);
-        DateFormat yesterday = new SimpleDateFormat("yyyy-MM-dd");
-        yesterday.format(cal.getTime());
+        var curr = feignClientExchange.getAllCurrency();
+        if (!curr.containsKey(currency))
+            return -999999d;
+        StringBuilder yesterday = new StringBuilder(LocalDate.now().minusDays(1).toString());
         Map<String, Double> yesterdayCourse = feignClientExchange.getYesterday(yesterday.toString(), apiKey)
                 .getRates();
         Map<String, Double> todayCourse = feignClientExchange.getToday(apiKey).getRates();
@@ -35,6 +32,4 @@ public class CourseService {
         Double todayRate = todayCourse.get(currency);
         return todayRate - yesterdayRate;
     }
-
-
 }
