@@ -6,7 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.net.URI;
 
 @RestController
@@ -21,15 +22,32 @@ public class RateController {
     }
 
     @GetMapping("/gif/{rate}")
-    public ResponseEntity<?> getGifURL(@PathVariable("rate") String rate) {
-        double diff = courseService.getDifferenceRate(rate);
-        if (diff < 99999d)
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        String gifUrl = gifService.getGifSource(diff);
-        if (gifUrl.equals("error"))
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+    public ResponseEntity<?> getGifURL(@PathVariable("rate") String rate, HttpServletResponse response) throws IOException {
+        double diff;
+        String gifUrl;
+        try {
+            diff = courseService.getDifferenceRate(rate);
+        } catch (RuntimeException e) {
+            response.sendRedirect("http://localhost:8080/api/errorNotFound");
+            return null;
+        }
+        try {
+            gifUrl = gifService.getGifSource(diff);
+        } catch (RuntimeException e) {
+            response.sendRedirect("http://localhost:8080/api/someError");
+            return null;
+        }
         return ResponseEntity.status(HttpStatus.FOUND)
                 .location(URI.create(gifUrl)).build();
     }
-
+    @GetMapping("/errorNotFound")
+    @ResponseBody
+    public String errNotFound() {
+        return "Ошибка ввода валюты!";
+    }
+    @GetMapping("/someError")
+    @ResponseBody
+    public String someError() {
+        return "Что-то пошло не так!";
+    }
 }

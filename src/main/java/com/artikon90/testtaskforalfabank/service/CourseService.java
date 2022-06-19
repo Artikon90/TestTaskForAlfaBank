@@ -1,5 +1,6 @@
 package com.artikon90.testtaskforalfabank.service;
 
+import com.artikon90.testtaskforalfabank.exception.CurrencyNotFoundException;
 import com.artikon90.testtaskforalfabank.feign.FeignClientExchange;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,7 +24,7 @@ public class CourseService {
     public Double getDifferenceRate(String currency) {
         var curr = feignClientExchange.getAllCurrency();
         if (!curr.containsKey(currency))
-            return -999999d;
+            throw new CurrencyNotFoundException();
         StringBuilder yesterday = new StringBuilder(LocalDate.now().minusDays(1).toString());
         Map<String, Double> yesterdayCourse = feignClientExchange.getYesterday(yesterday.toString(), apiKey)
                 .getRates();

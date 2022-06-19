@@ -1,5 +1,6 @@
 package com.artikon90.testtaskforalfabank.service;
 
+import com.artikon90.testtaskforalfabank.exception.CurrencyRateException;
 import com.artikon90.testtaskforalfabank.feign.FeignClientGif;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,7 +12,6 @@ public class GifService {
     private String apiKey;
     private final String STATUS_GOOD = "rich";
     private final String STATUS_BAD = "broke";
-    private final String STATUS_ERROR = "error";
     private final FeignClientGif feignClientGif;
 
     @Autowired
@@ -26,8 +26,7 @@ public class GifService {
         else if (difference < 0)
             res = STATUS_BAD;
         else {
-            res = STATUS_ERROR;
-            return res;
+            throw new CurrencyRateException();
         }
         return (String) feignClientGif.getGif(apiKey, res).getData().get("embed_url");
     }
