@@ -33,3 +33,11 @@ dependencies {
 tasks.named('test') {
     useJUnitPlatform()
 }
+jar {
+    archiveName 'foralfa.jar'
+    manifest {
+        attributes(
+                'Main-Class': 'com.artikon90.testtaskforalfabank.TestTaskForAlfaBankApplication'
+        )
+    }
+}
