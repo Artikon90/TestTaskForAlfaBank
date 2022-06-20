@@ -22,8 +22,8 @@ public class CourseService {
     }
 
     public Double getDifferenceRate(String currency) {
-        var curr = feignClientExchange.getAllCurrency();
-        if (!curr.containsKey(currency))
+        HashMap<String, String> curr = feignClientExchange.getAllCurrency();
+        if (!curr.containsKey(currency) || currency == null)
             throw new CurrencyNotFoundException();
         StringBuilder yesterday = new StringBuilder(LocalDate.now().minusDays(1).toString());
         Map<String, Double> yesterdayCourse = feignClientExchange.getYesterday(yesterday.toString(), apiKey)

@@ -20,14 +20,13 @@ public class GifService {
     }
 
     public String getGifSource(Double difference) {
-        String res;
-        if (difference > 0)
+        String res = "";
+        if (difference == null || difference == 0)
+            throw new CurrencyRateException();
+        else if (difference > 0)
             res = STATUS_GOOD;
         else if (difference < 0)
             res = STATUS_BAD;
-        else {
-            throw new CurrencyRateException();
-        }
         return (String) feignClientGif.getGif(apiKey, res).getData().get("embed_url");
     }
 }
